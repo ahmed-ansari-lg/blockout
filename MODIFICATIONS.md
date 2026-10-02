@@ -35,3 +35,24 @@ patch syntax and are documented by path under `third_party/ffmpeg/`.
 A stable or commercial distribution remains gated on upstream/trademark
 permission, platform code signing/notarization, a final FFmpeg/H.264
 distribution review, and the ordinary complete third-party compliance review.
+
+## Continuous camera paths and orientation (2026)
+
+Downstream fork: [github.com/ahmed-ansari-lg/blockout](https://github.com/ahmed-ansari-lg/blockout),
+branch `smooth-camera-paths`. Behavioral changes to the camera only — actor
+blocking, exports, and the document schema are unchanged:
+
+- Camera legs shape their end tangents from the neighbouring marks (or their
+  `via` points), so multi-mark moves such as the orbit presets follow a
+  continuous curve instead of straight chords between marks. The first and
+  last legs extrapolate the path's bend from their spacing, falling back to the
+  previous mirrored end when the spacing is too uneven.
+- Pan, tilt, roll and focal length use a monotone cubic Hermite in each leg's
+  eased-progress space (`src/engine/camera-orient.ts`) instead of a per-leg
+  smoothstep: the turn rate carries through un-eased marks, still eases to a
+  stop where the travel eases, never overshoots a mark's values, and reduces
+  exactly to the previous smoothstep blend when both ends of a leg are eased.
+
+Changed upstream files carrying a first-lines notice: `src/engine/evaluate.ts`,
+`src/engine/path.ts`. New files: `src/engine/camera-orient.ts`,
+`tests/unit/camera-smooth.test.ts`.
